@@ -22,30 +22,63 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({ Key? key }) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late int first, second;
+  late String opp;
+  late String result, text = "";
+  void btnClicked(String btnText) {
+    if (btnText == "C") {
+      result = "";
+      text = "";
+      first = 0;
+      second = 0;
+    } else if (btnText == "+" ||
+        btnText == "-" ||
+        btnText == "*" ||
+        btnText == "/") {
+      first = int.parse(text);
+      result = "";
+      opp = btnText;
+    } else if (btnText == "=") {
+      second = int.parse(text);
+      if (opp == "+") {
+        result = (first + second).toString();
+      } else if (opp == "-") {
+        result = (first - second).toString();
+      } else if (opp == "*") {
+        result = (first * second).toString();
+      } else if (opp == "/") {
+        result = (first / second).toString();
+      }
+    } else {
+      result = int.parse(text + btnText).toString();
+    }
 
-  void btnClicked(String btnText)
-  {
+    setState(() {
+      text = result;
+    });
   }
 
-  Widget customOutlineButton(String value, )
-  {
+  Widget customOutlineButton(
+    String value,
+  ) {
     return Expanded(
-      child: OutlineButton(onPressed: () => btnClicked(value),
-                  padding: EdgeInsets.all(25),
-                  child: 
-                  Text(value,
-                  style: TextStyle(
-                    fontSize: 25,
-                      ),
-                    ),
-                  ),
+      child: OutlineButton(
+        onPressed: () => btnClicked(value),
+        padding: EdgeInsets.all(25),
+        child: Text(
+          value,
+          style: TextStyle(
+            fontSize: 25,
+          ),
+        ),
+      ),
     );
   }
 
@@ -55,23 +88,23 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("Calculator"),
       ),
-      body: 
-      Container(
+      body: Container(
         child: Column(
           children: [
-            Expanded(child:
-             Container(
+            Expanded(
+                child: Container(
               color: Colors.blue[400],
               alignment: Alignment.bottomRight,
               padding: EdgeInsets.all(10),
-              child: Text('0', 
-              style: TextStyle(
-                fontSize: 50,
-                fontWeight: FontWeight.w700,
-                color: Colors.yellow[400],
-              ),),
-            )
-            ),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.yellow[400],
+                ),
+              ),
+            )),
             Row(
               children: [
                 customOutlineButton("9"),
