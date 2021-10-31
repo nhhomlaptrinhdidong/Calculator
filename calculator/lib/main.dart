@@ -1,8 +1,4 @@
-// Copyright 2018 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-import 'dart:math';
+  import 'dart:math';
 import 'package:calculator/hover.dart';
 import 'package:flutter/material.dart';
 import 'hover.dart';
@@ -30,12 +26,13 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>{
   late double first, second;
   late String opp;
   late String result, text = "",history='',key ='';
   bool advanced = false;
   bool advancedFunction=false;
+  late String firstText,secondText;
   double Trigonometric()
   {
     double x = 0;
@@ -57,16 +54,16 @@ class _HomePageState extends State<HomePage> {
       return x;
   }
   void btnClicked(String btnText) {
-    if (btnText == "C") {
+    if (btnText == "AC") {
       result = "";
       text = "";
       first = 0;
       second = 0;
       history ='';
       key="";
-    } else if (btnText=="="&& (key == "sin"||key == "cos"||key == "tan"||key=="√")&& opp==""){
+    } else if (btnText=="="&& (key == "sin"||key == "cos"||key == "tan"||key=="√")){
       first = double.parse(text);
-      Trigonometric();
+      result =Trigonometric().toString();
       key="";
       history= history+"("+first.toString()+")";
     }
@@ -80,8 +77,10 @@ class _HomePageState extends State<HomePage> {
       {
         history= history+"("+first.toString()+")";
         first = Trigonometric();
+        key="";
       }else
-        history = first.toString()+btnText;
+      firstText=first.toString();
+      history = first.toString()+btnText;
       result = "";
       opp = btnText;
     } 
@@ -97,13 +96,13 @@ class _HomePageState extends State<HomePage> {
         result = (first / second).toString();
       } else if (opp == "^") {
         result = pow(first, second).toString();
-      }    
-      if(key=="")
-      history= history+second.toString();
-      else
-      history= history+opp+second.toString();
-
-    } else if (btnText == "%") {
+      } 
+        history= history+second.toString();
+        history="";
+        first=0;
+        second=0;
+    } 
+    else if (btnText == "%") {
       first = double.parse(text);
       result = (first / 100).toString();
     } else if (btnText == ".") {
@@ -123,8 +122,11 @@ class _HomePageState extends State<HomePage> {
       
     }
     else if (btnText == "sin"||btnText == "cos"||btnText == "tan"||btnText=="√") {
+
       advancedFunction=true;
+      result = "";
       history= key = btnText;
+      
     }
     else if(btnText=="π")
     {
@@ -138,30 +140,65 @@ class _HomePageState extends State<HomePage> {
       {
         c=first*i;
       }
+      history = first.toString()+"!";
       result=c.toString();
       
     }
+    else if (btnText == "C") {
+
+        if(text!="0")
+        {
+          first = double.parse(text);
+          result = (first/10).toInt().toString();
+          
+        }
+        else if(text=="0"&&history!="")
+        {
+          if(opp!="")
+          {
+            opp="";
+            history=secondText;
+            result =firstText;
+          }
+          else
+          {
+            history="";  
+            result =firstText;
+          }
+        }
+    }
     else {
       advancedFunction=false;
+      //text = "";
+
       result = double.parse(text + btnText).toString();
     }
     setState(() {
       text = result;
     });
   }
-
   Widget customOutlineButton(String value) {
     return Expanded(
       child: OnHover(builder: (isHovered){
         final color = isHovered?Colors.orange[300]:Colors.white;
         return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(50),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white,
+                Colors.grey,
+              ],
+            )),
           padding: EdgeInsets.all(8),
-          child: MouseRegion(   
+          child: MouseRegion(  
             child: OutlinedButton(        
                style: OutlinedButton.styleFrom(
                 primary: Colors.black,
                 backgroundColor: color,
-                shadowColor: Colors.red,
+                
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
               ),
               onPressed: () => btnClicked(value),
@@ -178,7 +215,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-Widget customIconBunton(String value, IconData icon, Color color, Color colori) {
+  Widget customIconBunton(String value, IconData icon, Color color, Color colori) {
     return Expanded(
       child: Container(
         padding: EdgeInsets.all(8),
@@ -198,6 +235,16 @@ Widget customIconBunton(String value, IconData icon, Color color, Color colori) 
     return Scaffold(
       appBar: AppBar(
         title: Text("Calculator"),
+        elevation: 30,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green, Colors.red]
+            )
+          ),
+        ),
       ),
       body: Container(
         child: Column(
@@ -251,7 +298,8 @@ Widget customIconBunton(String value, IconData icon, Color color, Color colori) 
               children: [
                 Row(
                   children: [
-                    customOutlineButton("C"),
+                    
+                    customOutlineButton("AC"),
                     customOutlineButton("x!"),
                     customOutlineButton("√"),    
                     customOutlineButton("π"),                  
@@ -286,21 +334,12 @@ Widget customIconBunton(String value, IconData icon, Color color, Color colori) 
                     customOutlineButton("x"),
                   ],
                 ),
-                // Row(
-                //   children: [
-                //     customOutlineButton("11"),
-                //     customOutlineButton("12"),
-                //     customOutlineButton("13"),
-                //     customOutlineButton("+"),
-                //     customOutlineButton("13"),
-                //     customOutlineButton("÷"),
-                //   ],
-                // ),
                  Row(
                   children: [
-                    customIconBunton("Change",Icons.change_circle, Colors.white, Colors.orange),
+                    customIconBunton("Change",Icons.autorenew_rounded, Colors.white, Colors.orange),
                     customOutlineButton("0"),
                     customOutlineButton("."),
+                    customIconBunton("C",Icons.backspace_outlined, Colors.white, Colors.red),
                     customIconBunton("=",Icons.drag_handle_outlined,Colors.orange, Colors.white),
                   ],
                 ),
@@ -310,7 +349,7 @@ Widget customIconBunton(String value, IconData icon, Color color, Color colori) 
               children: [
                 Row(
                   children: [
-                    customOutlineButton("C"),
+                    customOutlineButton("AC"),
                     customOutlineButton("%"),
                     customOutlineButton("^"),                  
                     customOutlineButton("÷"),
@@ -342,10 +381,11 @@ Widget customIconBunton(String value, IconData icon, Color color, Color colori) 
                 ),
                 Row(
                   children: [
-                    customIconBunton("Change",Icons.change_circle, Colors.white, Colors.orange),
+                    customIconBunton("Change",Icons.autorenew_rounded, Colors.white, Colors.orange),
                     customOutlineButton("0"),
                     customOutlineButton("."),
-                    customIconBunton("=",Icons.drag_handle_outlined,Colors.orange, Colors.white),
+                    customIconBunton("C",Icons.backspace_outlined, Colors.white, Colors.red),
+                    customIconBunton("=",Icons.drag_handle_outlined,Colors.orange, Colors.white),                                    
                   ],
                 ),
               ],
@@ -356,3 +396,4 @@ Widget customIconBunton(String value, IconData icon, Color color, Color colori) 
     );
   }
 }
+
